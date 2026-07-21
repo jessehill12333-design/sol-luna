@@ -6,7 +6,7 @@ SCRIPT_NAME="${SCRIPT_DIR##*/}"
 SCRIPT_NAME="${SCRIPT_NAME^}"
 
 if [[ -t 1 ]]; then
-    printf '\033]0;%s\007' "$SCRIPT_NAME"
+    printf '\033]0;%s [Med/Low Effort]\007' "$SCRIPT_NAME"
 fi
 
 SAVED_DIR="/tumble-storage/tumble-script/_saved/sol-luna"
