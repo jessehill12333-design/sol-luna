@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Sol-Luna
+Comment=OpenCode session with Sol medium-effort reviewer and Luna low-effort implementer
+Exec=/tumble-storage/tumble-script/sol-luna/run.sh
+Path=/tumble-storage/tumble-script
+Icon=utilities-terminal
+Categories=Development;TerminalEmulator;
+Terminal=true
+X-KDE-Trusted=true
