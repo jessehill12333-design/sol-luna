@@ -14,6 +14,25 @@ SOL_MODEL="opencode/gpt-5.6-sol"
 LUNA_MODEL="opencode/gpt-5.6-luna"
 MAX_REVIEW_CYCLES=3
 
+set_sol_luna_tui_variants() {
+    local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/opencode"
+    local state_file="$state_dir/model.json"
+    local temporary_file
+
+    [[ -f "$state_file" ]] || return 0
+    temporary_file="$(mktemp "$state_dir/model.json.XXXXXX")"
+    if jq --arg sol "$SOL_MODEL" --arg luna "$LUNA_MODEL" \
+        '.variant = (.variant // {}) | .variant[$sol] = "medium" | .variant[$luna] = "low"' \
+        "$state_file" > "$temporary_file"; then
+        chmod --reference="$state_file" "$temporary_file"
+        mv -f -- "$temporary_file" "$state_file"
+        return 0
+    fi
+
+    rm -f -- "$temporary_file"
+    return 1
+}
+
 usage() {
     cat <<'EOF'
 Usage: ./run.sh [OPENCODE ARGUMENTS]
@@ -103,9 +122,7 @@ OPENCODE_CONFIG_CONTENT="$(cat <<EOF
       "mode": "primary",
       "model": "$LUNA_MODEL",
       "variant": "low",
-      "options": {
-        "reasoning": { "effort": "low" }
-      },
+      "reasoningEffort": "low",
       "prompt": "You are Luna Implement. Use the agreed plan and conversation context to explore the repository and make the requested changes. Read \$SOL_LUNA_RUN_DIR/context.txt before editing. Do not repeat broad planning; identify only the details needed to implement and verify the work. Preserve pre-existing changes recorded in \$SOL_LUNA_RUN_DIR/baseline-status.txt. Run relevant tests or checks. In a Git repository, create a build checkpoint commit named 'sol-luna: build checkpoint' only when the files you changed do not overlap pre-existing changed files; otherwise leave the work uncommitted and report the overlap. Never push.",
       "steps": 30
     },
@@ -114,9 +131,7 @@ OPENCODE_CONFIG_CONTENT="$(cat <<EOF
       "mode": "primary",
       "model": "$SOL_MODEL",
       "variant": "medium",
-      "options": {
-        "reasoning": { "effort": "medium" }
-      },
+      "reasoningEffort": "medium",
       "prompt": "You are Sol Review. Review the implementation against the agreed plan, acceptance criteria, and repository reality. Read \$SOL_LUNA_RUN_DIR/context.txt, the baseline status files, relevant files, git status, git diff, and git diff \$SOL_LUNA_BASE_COMMIT when a base commit exists. Run safe verification checks as needed. You are read-only: never edit or write files yourself. Report each finding with severity, file and line, evidence, whether it is a plan deviation or bug, and a concrete repair instruction. If findings exist and this is a Git repository, delegate them to the luna-repair subagent. Ask that subagent to preserve baseline changes, avoid overlapping files when checkpointing, run tests, and never push. After repair, inspect the new diff and re-review. Repeat for at most \$MAX_REVIEW_CYCLES cycles. Stop and report unresolved findings or unsafe overlaps. If the implementation satisfies the plan and checks, report CLEAN.",
       "steps": 40,
       "permission": {
@@ -146,9 +161,7 @@ OPENCODE_CONFIG_CONTENT="$(cat <<EOF
       "mode": "subagent",
       "model": "$LUNA_MODEL",
       "variant": "low",
-      "options": {
-        "reasoning": { "effort": "low" }
-      },
+      "reasoningEffort": "low",
       "prompt": "You are Luna Repair. Implement only the concrete findings supplied by Sol Review. Read \$SOL_LUNA_RUN_DIR/context.txt and \$SOL_LUNA_RUN_DIR/baseline-status.txt first. Preserve all pre-existing changes and do not edit files unrelated to the findings. Run relevant tests or checks after editing. In a Git repository, create a repair checkpoint commit named 'sol-luna: repair checkpoint' only when your changed files do not overlap baseline-changed files; otherwise leave the work uncommitted and report the overlap. Never push.",
       "steps": 30
     }
@@ -171,12 +184,35 @@ OPENCODE_CONFIG_CONTENT="$(cat <<EOF
     }
   },
   "provider": {
-    "opencode": {}
+    "opencode": {
+      "models": {
+        "gpt-5.6-sol": {
+          "reasoning": true,
+          "variants": {
+            "medium": {
+              "reasoningEffort": "medium"
+            }
+          }
+        },
+        "gpt-5.6-luna": {
+          "reasoning": true,
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            }
+          }
+        }
+      }
+    }
   }
 }
 EOF
 )"
 export OPENCODE_CONFIG_CONTENT
+
+if ! set_sol_luna_tui_variants; then
+    printf 'WARNING: could not set the persisted Sol and Luna OpenCode variants.\n' >&2
+fi
 
 printf 'Launching opencode %s with Sol (medium-effort review) + Luna (low-effort implement)...\n\n' "$(opencode --version)"
 
