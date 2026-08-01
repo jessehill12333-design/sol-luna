@@ -32,7 +32,7 @@ The launcher checks that both required model IDs are available before opening an
 
 ## Git behavior
 
-Git is the quality-gate baseline. Sol Review uses the recorded starting state and current diff to identify bugs and plan deviations. Luna may create `sol-luna: build checkpoint` and `sol-luna: repair checkpoint` commits when its changed files do not overlap files that were already dirty at startup. It never pushes.
+Git is the quality-gate baseline. Sol Review uses the recorded starting state and current diff to identify bugs and plan deviations. Luna may create `sol-luna: build checkpoint` and `sol-luna: repair checkpoint` commits when its changed files do not overlap files that were already dirty at startup. Runtime Sol/Luna agents never push those checkpoints; a separate maintenance workflow may publish them only with explicit user authorization.
 
 Pre-existing dirty work is allowed, but overlapping files are not automatically committed; the agent reports the overlap for manual handling. In a non-Git directory, implementation and review remain available, but the Git-diff baseline, automatic repair delegation, and checkpoint commits are unavailable.
 

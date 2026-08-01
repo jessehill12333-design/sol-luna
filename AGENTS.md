@@ -14,4 +14,6 @@ via the Codex subscription.
 - The opencode config is generated at runtime from a heredoc in `run.sh`; edit the heredoc to change agent settings.
 - Preserve the Implement -> Review -> Repair workflow and its three-cycle review limit.
 - Treat the run context under `_saved/sol-luna/runs/` as the baseline source for dirty-worktree handling.
-- Never push from an agent or launcher workflow.
+- Runtime agents launched by this tool may create local checkpoint commits but
+  must never push them. A separate maintenance workflow may push only when the
+  user explicitly authorizes publication.
