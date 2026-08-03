@@ -11,6 +11,9 @@ SCRIPT_NAME="${SCRIPT_NAME^}"
 if [[ -t 1 ]]; then
     printf '\033]0;%s [Med/Low Effort]\007' "$SCRIPT_NAME"
 fi
+export TERMINAL_STATUS_TITLE="$SCRIPT_NAME"
+source "$SCRIPT_DIR/launchers/lib/terminal.sh"
+relaunch_in_terminal_if_needed "$@"
 
 SAVED_DIR="/tumble-storage/tumble-script/_saved/sol-luna"
 SOL_MODEL="opencode/gpt-5.6-sol"
@@ -231,9 +234,5 @@ else
     printf '\nExited with code %d.\n' "$EXIT_CODE"
 fi
 
-if [[ -t 1 ]]; then
-    printf 'Press any key to exit...'
-    read -r -n 1 -s /dev/tty
-fi
 
 exit $EXIT_CODE
