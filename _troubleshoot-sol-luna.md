@@ -9,7 +9,7 @@ This file contains the troubleshooting history formerly embedded in the reposito
 
 **Status:** WORKAROUND
 
-**Shortcut:** `/tumble-storage/tumble-shortcut/ai-harness/sol-luna.desktop`
+**Shortcut:** `/OS-keep/tumble-shortcut/ai-harness/sol-luna.desktop`
 
 **Symptom:** OpenCode can display a persisted per-model variant instead of the effort configured by the launcher.
 

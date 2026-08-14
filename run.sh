@@ -15,7 +15,7 @@ export TERMINAL_STATUS_TITLE="$SCRIPT_NAME"
 source "$SCRIPT_DIR/launchers/lib/terminal.sh"
 relaunch_in_terminal_if_needed "$@"
 
-SAVED_DIR="/tumble-storage/tumble-script/_saved/sol-luna"
+SAVED_DIR="/OS-keep/tumble-script/_saved/sol-luna"
 SOL_MODEL="opencode/gpt-5.6-sol"
 LUNA_MODEL="opencode/gpt-5.6-luna"
 MAX_REVIEW_CYCLES=3
