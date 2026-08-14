@@ -27,7 +27,7 @@ terminal_status_pause_on_exit() {
         if (( status == 0 )); then
             printf 'SUCCESS: %s finished.\n' "${TERMINAL_STATUS_TITLE:-script}"
         else
-            printf 'FAILED: %s did not complete successfully.\n' "${TERMINAL_STATUS_TITLE:-script}"
+            printf 'FAILED: %s %s\n' "${TERMINAL_STATUS_TITLE:-script}" "${TERMINAL_STATUS_FAILURE_MSG:-did not complete successfully.}"
         fi
         printf 'Press any key to exit.'
         read -r -n 1 -s <&3 || true
@@ -71,7 +71,7 @@ relaunch_in_terminal_if_needed() {
     title="${TERMINAL_STATUS_TITLE:-$(basename -- "$0" .sh)}"
     display_title="${TERMINAL_STATUS_TITLE:-$title}"
     printf -v success_q '%q' "SUCCESS: $display_title finished."
-    printf -v failure_q '%q' "FAILED: $display_title did not complete successfully."
+    printf -v failure_q '%q' "FAILED: $display_title ${TERMINAL_STATUS_FAILURE_MSG:-did not complete successfully.}"
     for arg in "$@"; do
         printf -v q '%q' "$arg"
         quoted+=("$q")
