@@ -122,6 +122,11 @@ OPENCODE_CONFIG_CONTENT="$(cat <<EOF
 {
   "\$schema": "https://opencode.ai/config.json",
   "default_agent": "luna-implement",
+  "mcp": {
+    "cua-driver": {
+      "enabled": false
+    }
+  },
   "agent": {
     "luna-implement": {
       "description": "Explore and implement with Luna at low reasoning effort.",
